@@ -1,163 +1,153 @@
-# 💳 Desafio Java Itaú - API de Transações
+# Desafio Itaú Unibanco - API de Transações
 
-![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-green?style=for-the-badge&logo=springboot)
-![Maven](https://img.shields.io/badge/Maven-3.8+-blue?style=for-the-badge&logo=apachemaven)
+API REST em Java 17 com Spring Boot 3 para receber transações, limpar dados em memória e calcular estatísticas dos últimos 60 segundos.
 
-API REST para gerenciamento de transações financeiras e cálculo de estatísticas em tempo real, desenvolvida como parte do desafio técnico do Itaú.
+## Tecnologias
 
-## 📋 Descrição
+- Java 17
+- Spring Boot 3.3.5
+- Spring Web
+- Spring Actuator
+- Maven Wrapper
+- JUnit 5
 
-Este projeto implementa uma API que permite:
-- Registrar transações financeiras com valor e data/hora
-- Calcular estatísticas das transações dos últimos 60 segundos
-- Limpar todas as transações registradas
-- Health check para monitoramento da aplicação
+## Requisitos atendidos
 
-## 🚀 Tecnologias Utilizadas
+- Endpoints exatamente como especificados: `/transacao` e `/estatistica`
+- Armazenamento totalmente em memória
+- Apenas JSON nas entradas e respostas com corpo
+- Validação de transações com retorno `422 Unprocessable Entity`
+- JSON inválido com retorno `400 Bad Request`
+- Estatísticas calculadas somente dentro da janela configurável
+- Testes automatizados cobrindo serviço e contrato HTTP
+- Health check extra em `/health/ping` e `/actuator/health`
+- Containerização com Docker
 
-- **Java 17**
-- **Spring Boot 4.0.2**
-- **Spring Web** - Para criação dos endpoints REST
-- **Spring Actuator** - Para monitoramento e métricas
-- **Lombok** - Para redução de código boilerplate
-- **Maven** - Gerenciamento de dependências
+## Como executar
 
-## 📁 Estrutura do Projeto
+Na raiz da aplicação:
 
-```
-transacao-api/
-├── src/main/java/com/kaique/transacao_api/
-│   ├── TransacaoApiApplication.java      # Classe principal
-│   ├── business/
-│   │   └── services/
-│   │       └── TransacaoService.java     # Lógica de negócio
-│   ├── controller/
-│   │   ├── PingController.java           # Health check
-│   │   ├── TransacaoController.java      # Endpoints principais
-│   │   └── dtos/
-│   │       ├── EstatisticaResponseDTO.java
-│   │       └── TransacaoRequestDTO.java
-│   └── infrastructure/
-│       └── exceptions/
-│           └── UnprocessableEntity.java  # Exceção customizada
-└── pom.xml
-```
-
-## 🔧 Instalação e Execução
-
-### Pré-requisitos
-- Java 17 ou superior
-- Maven 3.8 ou superior
-
-### Passos para execução
-
-1. **Clone o repositório:**
 ```bash
-git clone https://github.com/kaiquedm12/desafio-Java-Itau.git
-cd desafio-Java-Itau/transacao-api
-```
-
-2. **Compile o projeto:**
-```bash
-./mvnw clean install
-```
-
-3. **Execute a aplicação:**
-```bash
+cd transacao-api
 ./mvnw spring-boot:run
 ```
 
-A API estará disponível em `http://localhost:8080`
+No Windows:
 
-## 📡 Endpoints da API
-
-### Transações
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `POST` | `/transacao` | Registra uma nova transação |
-| `DELETE` | `/transacao` | Remove todas as transações |
-| `GET` | `/estatistica` | Retorna estatísticas dos últimos 60 segundos |
-
-### Health Check
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `GET` | `/health/ping` | Verifica se a API está ativa |
-
-## 📝 Exemplos de Uso
-
-### Registrar uma transação
-
-```bash
-curl -X POST http://localhost:8080/transacao \
-  -H "Content-Type: application/json" \
-  -d '{
-    "valor": 150.50,
-    "dataHora": "2026-02-02T10:30:00.000-03:00"
-  }'
+```powershell
+cd transacao-api
+.\mvnw.cmd spring-boot:run
 ```
 
-**Resposta:** `201 Created`
+A aplicação sobe em `http://localhost:8080`.
 
-### Obter estatísticas
-
-```bash
-curl -X GET http://localhost:8080/estatistica
-```
-
-**Resposta:**
-```json
-{
-  "count": 5,
-  "sum": 750.25,
-  "avg": 150.05,
-  "min": 50.00,
-  "max": 300.00
-}
-```
-
-### Limpar transações
+## Como testar
 
 ```bash
-curl -X DELETE http://localhost:8080/transacao
-```
-
-**Resposta:** `204 No Content`
-
-## 📊 Modelo de Dados
-
-### TransacaoRequestDTO
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `valor` | `Double` | Valor da transação (deve ser >= 0) |
-| `dataHora` | `OffsetDateTime` | Data e hora da transação (não pode ser no futuro) |
-
-### EstatisticaResponseDTO
-| Campo | Tipo | Descrição |
-|-------|------|-----------|
-| `count` | `long` | Quantidade de transações nos últimos 60s |
-| `sum` | `double` | Soma dos valores |
-| `avg` | `double` | Média dos valores |
-| `min` | `double` | Menor valor |
-| `max` | `double` | Maior valor |
-
-## ⚠️ Regras de Negócio
-
-- **Valor negativo:** Transações com valor negativo são rejeitadas (HTTP 422)
-- **Data futura:** Transações com data/hora no futuro são rejeitadas (HTTP 422)
-- **Estatísticas:** São calculadas apenas com base nas transações dos últimos 60 segundos
-- **Armazenamento:** As transações são armazenadas em memória (não persistidas)
-
-## 🧪 Testes
-
-Para executar os testes:
-
-```bash
+cd transacao-api
 ./mvnw test
 ```
 
-## 📄 Licença
+No Windows:
+
+```powershell
+cd transacao-api
+.\mvnw.cmd test
+```
+
+## Endpoints obrigatórios
+
+### `POST /transacao`
+
+Recebe uma transação no formato:
+
+```json
+{
+  "valor": 123.45,
+  "dataHora": "2020-08-07T12:34:56.789-03:00"
+}
+```
+
+Regras:
+
+- `valor` é obrigatório e deve ser maior ou igual a `0`
+- `dataHora` é obrigatória e não pode estar no futuro
+- qualquer JSON malformado retorna `400 Bad Request`
+- qualquer violação de regra de negócio retorna `422 Unprocessable Entity`
+
+Respostas:
+
+- `201 Created` sem corpo
+- `400 Bad Request` sem corpo
+- `422 Unprocessable Entity` sem corpo
+
+### `DELETE /transacao`
+
+Remove todas as transações armazenadas.
+
+Resposta:
+
+- `200 OK` sem corpo
+
+### `GET /estatistica`
+
+Retorna estatísticas das transações ocorridas nos últimos `60` segundos:
+
+```json
+{
+  "count": 10,
+  "sum": 1234.56,
+  "avg": 123.456,
+  "min": 12.34,
+  "max": 123.56
+}
+```
+
+Quando não houver transações na janela, todos os campos retornam `0`.
+
+## Configuração
+
+A janela de cálculo pode ser configurada em [transacao-api/src/main/resources/application.properties](transacao-api/src/main/resources/application.properties):
+
+```properties
+app.statistics.window-seconds=60
+```
+
+## Extras implementados
+
+- Logs no serviço de transações
+- Health check JSON em `GET /health/ping`
+- Actuator health em `GET /actuator/health`
+- Containerização com Docker
+
+## Docker
+
+Build da imagem:
+
+```bash
+docker build -t transacao-api ./transacao-api
+```
+
+Execução:
+
+```bash
+docker run --rm -p 8080:8080 transacao-api
+```
+
+## Docker Compose
+
+Suba a aplicação com um único comando:
+
+```bash
+docker compose -f transacao-api/docker-compose.yml up --build
+```
+
+Para parar e remover os recursos criados:
+
+```bash
+docker compose -f transacao-api/docker-compose.yml down
+```
+
+## Licença
 
 Este projeto foi desenvolvido como parte de um desafio técnico.

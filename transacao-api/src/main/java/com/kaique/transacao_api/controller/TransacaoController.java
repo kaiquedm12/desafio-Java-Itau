@@ -1,16 +1,15 @@
 package com.kaique.transacao_api.controller;
 
-import com.kaique.transacao_api.business.services.TransacaoService;
-import com.kaique.transacao_api.controller.dtos.EstatisticaResponseDTO;
-
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kaique.transacao_api.business.services.TransacaoService;
+import com.kaique.transacao_api.controller.dtos.EstatisticaResponseDTO;
 import com.kaique.transacao_api.controller.dtos.TransacaoRequestDTO;
 
 @RestController
@@ -22,12 +21,12 @@ public class TransacaoController {
         this.transacaoService = transacaoService;
     }
 
-    @GetMapping("/estatistica")
+    @GetMapping(value = "/estatistica", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<EstatisticaResponseDTO> estatisticas() {
         return ResponseEntity.ok(transacaoService.obterEstatisticas());
     }
 
-    @PostMapping("/transacao")
+    @PostMapping(value = "/transacao", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> adicionarTransacao(@RequestBody TransacaoRequestDTO transacaoRequestDTO) {
         transacaoService.adicionarTransacao(transacaoRequestDTO);   
         return ResponseEntity.status(201).build();
@@ -36,6 +35,6 @@ public class TransacaoController {
     @DeleteMapping("/transacao")
     public ResponseEntity<Void> limparTransacoes() {
         transacaoService.limparTransacoes();
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
