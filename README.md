@@ -158,10 +158,6 @@ Para executar os testes:
 ./mvnw test
 ```
 
-## 👨‍💻 Autor
-
-**Kaique** - [GitHub](https://github.com/kaiquedm12)
-
 ## 📄 Licença
 
 Este projeto foi desenvolvido como parte de um desafio técnico.
