@@ -13,6 +13,11 @@ public class ApiExceptionHandler {
         return ResponseEntity.unprocessableEntity().build();
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Void> handleNotFound(NotFoundException exception) {
+        return ResponseEntity.notFound().build();
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Void> handleBadRequest(HttpMessageNotReadableException exception) {
         return ResponseEntity.badRequest().build();

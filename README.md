@@ -2,6 +2,8 @@
 
 API REST em Java 17 com Spring Boot 3 para receber transações, limpar dados em memória e calcular estatísticas dos últimos 60 segundos.
 
+Extras: endpoints para cadastro de usuários, depósito, consulta de saldo e transferência entre usuários (tudo em memória).
+
 ## Tecnologias
 
 - Java 17
@@ -105,6 +107,130 @@ Retorna estatísticas das transações ocorridas nos últimos `60` segundos:
 
 Quando não houver transações na janela, todos os campos retornam `0`.
 
+## Endpoints adicionais (extras)
+
+Observação: esta API retorna corpo vazio para erros `400`, `404` e `422` (apenas o status HTTP).
+
+### `POST /usuarios`
+
+Cria um usuário em memória (saldo inicial `0.00`).
+
+Request:
+
+```json
+{
+  "nome": "Kaique",
+  "email": "kaique@example.com"
+}
+```
+
+Regras:
+
+- `nome` é obrigatório (até 120 caracteres)
+- `email` é obrigatório (até 254 caracteres), normalizado para minúsculo e deve conter `@`
+- não permite email duplicado (case-insensitive) -> `422 Unprocessable Entity`
+
+Respostas:
+
+- `201 Created` com JSON do usuário (inclui `id` e `saldo`)
+- `400 Bad Request` sem corpo (JSON inválido)
+- `422 Unprocessable Entity` sem corpo (validação/regra de negócio)
+
+Exemplo de resposta:
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "nome": "Kaique",
+  "email": "kaique@example.com",
+  "saldo": 0.00
+}
+```
+
+### `GET /usuarios/{id}`
+
+Busca um usuário por `id`.
+
+Respostas:
+
+- `200 OK` com JSON do usuário
+- `404 Not Found` sem corpo (não existe)
+
+### `GET /usuarios/{id}/saldo`
+
+Consulta o saldo atual do usuário.
+
+Respostas:
+
+- `200 OK`
+- `404 Not Found` sem corpo (não existe)
+
+Exemplo de resposta:
+
+```json
+{ "saldo": 10.00 }
+```
+
+### `POST /usuarios/{id}/deposito`
+
+Adiciona saldo ao usuário.
+
+Request:
+
+```json
+{ "valor": 10.00 }
+```
+
+Regras:
+
+- `valor` é obrigatório, deve ser maior que `0` e ter no máximo 2 casas decimais
+
+Respostas:
+
+- `200 OK` com o saldo atualizado
+- `400 Bad Request` sem corpo (JSON inválido)
+- `404 Not Found` sem corpo (usuário não existe)
+- `422 Unprocessable Entity` sem corpo (validação/regra de negócio)
+
+### `POST /transferencias`
+
+Transfere saldo entre dois usuários.
+
+Request:
+
+```json
+{
+  "origemId": "00000000-0000-0000-0000-000000000000",
+  "destinoId": "11111111-1111-1111-1111-111111111111",
+  "valor": 7.50
+}
+```
+
+Regras:
+
+- `origemId` e `destinoId` são obrigatórios e devem ser diferentes
+- `valor` é obrigatório, deve ser maior que `0` e ter no máximo 2 casas decimais
+- saldo insuficiente -> `422 Unprocessable Entity`
+
+Respostas:
+
+- `201 Created` com os saldos pós-transferência
+- `400 Bad Request` sem corpo (JSON inválido)
+- `404 Not Found` sem corpo (origem/destino não existe)
+- `422 Unprocessable Entity` sem corpo (validação/regra de negócio)
+
+Exemplo de resposta:
+
+```json
+{
+  "origemId": "00000000-0000-0000-0000-000000000000",
+  "destinoId": "11111111-1111-1111-1111-111111111111",
+  "valor": 7.50,
+  "saldoOrigem": 12.50,
+  "saldoDestino": 7.50
+}
+```
+
 ## Configuração
 
 A janela de cálculo pode ser configurada em [transacao-api/src/main/resources/application.properties](transacao-api/src/main/resources/application.properties):
@@ -118,6 +244,7 @@ app.statistics.window-seconds=60
 - Logs no serviço de transações
 - Health check JSON em `GET /health/ping`
 - Actuator health em `GET /actuator/health`
+- Cadastro de usuários, depósito, consulta de saldo e transferência (em memória)
 - Containerização com Docker
 
 ## Docker
@@ -151,3 +278,4 @@ docker compose -f transacao-api/docker-compose.yml down
 ## Licença
 
 Este projeto foi desenvolvido como parte de um desafio técnico.
+
