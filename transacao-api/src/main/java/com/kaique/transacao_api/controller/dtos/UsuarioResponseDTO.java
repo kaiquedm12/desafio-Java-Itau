@@ -7,6 +7,7 @@ public record UsuarioResponseDTO(
         UUID id,
         String nome,
         String email,
-        BigDecimal saldo
+        BigDecimal saldo,
+        String senhaTemporaria
 ) {}
 
